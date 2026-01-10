@@ -1,0 +1,4641 @@
+	section	.text,"ax",@progbits
+	assume	adl = 1
+	section	.text,"ax",@progbits
+	public	_linker_reset
+_linker_reset:
+	ld	hl, 53248
+	ld	de, 0
+	ld	(_code_ptr), hl
+	ld	(_code_size), de
+	ret
+	section	.text,"ax",@progbits
+
+	section	.text,"ax",@progbits
+	public	_linker_emit
+_linker_emit:
+	ld	hl, -3
+	call	__frameset
+	ld	iy, (_code_ptr)
+	ld	bc, 0
+	ld	c, (ix + 9)
+	lea	hl, iy
+	add	hl, bc
+	ld	de, 61441
+	or	a, a
+	sbc	hl, de
+	ld	hl, 0
+	jr	nc, BB1_5
+	ld	hl, (ix + 6)
+	ld	(ix - 3), hl
+	inc	iy
+	push	bc
+	pop	de
+BB1_2:
+	push	de
+	pop	hl
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jr	z, BB1_4
+	ld	hl, (ix - 3)
+	ld	a, (hl)
+	ld	(_code_ptr), iy
+	ld	(iy - 1), a
+	inc	hl
+	ld	(ix - 3), hl
+	dec	de
+	inc	iy
+	jr	BB1_2
+BB1_4:
+	ld	hl, (_code_size)
+	add	hl, bc
+	ld	(_code_size), hl
+	ld	de, 1
+	ex	de, hl
+BB1_5:
+	ld	sp, ix
+	pop	ix
+	ret
+	section	.text,"ax",@progbits
+
+	section	.text,"ax",@progbits
+	public	_linker_run
+_linker_run:
+	ld	hl, -3
+	call	__frameset
+	ld	hl, _.str
+	push	hl
+	call	_ti_Delete
+	pop	hl
+	ld	hl, _.str.1
+	push	hl
+	ld	hl, _.str
+	push	hl
+	call	_ti_Open
+	ld	c, a
+	pop	hl
+	pop	hl
+	or	a, a
+	jr	z, BB2_2
+	ld	iy, 53248
+	ld	hl, 1
+	ld	de, (_code_size)
+	push	bc
+	push	de
+	push	hl
+	push	iy
+	ld	(ix - 3), bc
+	call	_ti_Write
+	pop	hl
+	pop	hl
+	pop	hl
+	pop	hl
+	ld	hl, (ix - 3)
+	push	hl
+	ld	hl, 1
+	push	hl
+	call	_ti_SetArchiveStatus
+	pop	hl
+	pop	hl
+	ld	hl, (ix - 3)
+	push	hl
+	call	_ti_Close
+	pop	hl
+BB2_2:
+	pop	hl
+	pop	ix
+	jp	53248
+	section	.text,"ax",@progbits
+
+	section	.text,"ax",@progbits
+	public	_trim
+_trim:
+	ld	hl, -6
+	call	__frameset
+	ld	hl, (ix + 6)
+	ld	(ix - 3), hl
+	push	hl
+	call	_strlen
+	push	hl
+	pop	de
+	pop	hl
+	ld	hl, (ix - 3)
+	dec	hl
+	ld	(ix - 3), hl
+BB3_1:
+	push	de
+	pop	hl
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jr	z, BB3_4
+	ld	hl, (ix - 3)
+	add	hl, de
+	ld	a, (hl)
+	ld	l, a
+	rlc	l
+	sbc	hl, hl
+	ld	l, a
+	push	hl
+	ld	(ix - 6), de
+	call	_isspace
+	pop	de
+	ld	de, (ix - 6)
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jr	z, BB3_4
+	ld	hl, (ix - 3)
+	add	hl, de
+	ld	(hl), 0
+	dec	de
+	jr	BB3_1
+BB3_4:
+	ld	sp, ix
+	pop	ix
+	ret
+	section	.text,"ax",@progbits
+
+	section	.text,"ax",@progbits
+	public	_add_label
+_add_label:
+	ld	hl, -4
+	call	__frameset
+	ld	a, (_label_count)
+	cp	a, 64
+	jr	nc, BB4_2
+	ld	de, _labels
+	ld	iy, 16
+	or	a, a
+	sbc	hl, hl
+	ld	l, a
+	ld	(ix - 1), a
+	ld	bc, 19
+	call	__imulu
+	push	hl
+	pop	bc
+	ex	de, hl
+	add	hl, bc
+	ld	(ix - 4), hl
+	push	iy
+	ld	de, (ix + 6)
+	push	de
+	push	hl
+	call	_strncpy
+	pop	hl
+	pop	hl
+	pop	hl
+	ld	iy, (ix - 4)
+	ld	(iy + 15), 0
+	ld	hl, (ix + 9)
+	ld	(iy + 16), hl
+	ld	a, (ix - 1)
+	inc	a
+	ld	(_label_count), a
+BB4_2:
+	ld	sp, ix
+	pop	ix
+	ret
+	section	.text,"ax",@progbits
+
+	section	.text,"ax",@progbits
+	public	_find_label
+_find_label:
+	ld	hl, -12
+	call	__frameset
+	ld	de, -1
+	ld	iy, _labels
+BB5_1:
+	ld	a, (_label_count)
+	ld	bc, 0
+	ld	c, a
+	inc	de
+	push	de
+	pop	hl
+	or	a, a
+	sbc	hl, bc
+	jr	nc, BB5_4
+	ld	(ix - 9), bc
+	lea	hl, iy + 19
+	ld	(ix - 6), hl
+	ld	hl, (ix + 6)
+	push	hl
+	ld	(ix - 12), iy
+	push	iy
+	ld	(ix - 3), de
+	call	_strcmp
+	ld	iy, (ix + 9)
+	lea	bc, iy
+	pop	de
+	pop	de
+	ld	de, (ix - 3)
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	ld	iy, (ix - 6)
+	jr	nz, BB5_1
+	ld	iy, (ix - 12)
+	ld	hl, (iy + 16)
+	push	bc
+	pop	iy
+	ld	(iy), hl
+	ld	bc, (ix - 9)
+BB5_4:
+	ex	de, hl
+	or	a, a
+	sbc	hl, bc
+	ccf
+	sbc	hl, hl
+	inc	hl
+	ld	sp, ix
+	pop	ix
+	ret
+	section	.text,"ax",@progbits
+
+	section	.text,"ax",@progbits
+	public	_assemble_line
+_assemble_line:
+	ld	hl, -26
+	call	__frameset
+	ld	de, (ix + 6)
+	or	a, a
+	sbc	hl, hl
+	ld	(ix - 14), hl
+	push	de
+	call	_trim
+	ld	iy, (ix + 6)
+	pop	hl
+	ld	a, (iy)
+	or	a, a
+	jp	z, BB6_24
+	ld	hl, _.str.2
+	push	hl
+	push	iy
+	call	_strtok
+	pop	de
+	pop	de
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jp	z, BB6_24
+	push	hl
+	ld	(ix - 17), hl
+	call	_strlen
+	push	hl
+	pop	de
+	pop	hl
+	ld	iy, (ix - 17)
+	lea	bc, iy
+	add	iy, de
+	ld	a, (iy - 1)
+	cp	a, 58
+	jr	nz, BB6_6
+	ld	(iy - 1), 0
+	bit	0, (ix + 12)
+	jr	nz, BB6_5
+	ld	hl, (ix + 9)
+	ld	hl, (hl)
+	push	hl
+	push	bc
+	call	_add_label
+	pop	hl
+	pop	hl
+BB6_5:
+	ld	hl, _.str.2
+	push	hl
+	ld	hl, 0
+	push	hl
+	call	_strtok
+	pop	de
+	pop	de
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jr	nz, BB6_7
+	jp	BB6_24
+BB6_6:
+	push	bc
+	pop	hl
+BB6_7:
+	ld	a, (hl)
+	cp	a, 59
+	jp	z, BB6_24
+	ld	de, _.str.1.3
+	push	de
+	push	hl
+	ld	(ix - 17), hl
+	call	_strcasecmp
+	pop	de
+	pop	de
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jp	z, BB6_23
+	ld	hl, _.str.2.4
+	push	hl
+	ld	hl, (ix - 17)
+	push	hl
+	call	_strcasecmp
+	pop	de
+	pop	de
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jp	z, BB6_23
+	ld	hl, _.str.4
+	push	hl
+	ld	hl, (ix - 17)
+	push	hl
+	call	_strcasecmp
+	pop	de
+	pop	de
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jp	z, BB6_34
+	ld	hl, _.str.5
+	push	hl
+	ld	hl, (ix - 17)
+	push	hl
+	call	_strcasecmp
+	pop	de
+	pop	de
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jp	z, BB6_34
+	ld	hl, (ix - 17)
+	push	hl
+	call	_lookup_instruction
+	push	hl
+	pop	iy
+	pop	hl
+	lea	hl, iy
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jp	nz, BB6_35
+	ld	hl, _.str.7
+	jp	BB6_43
+BB6_14:
+	push	hl
+	ld	(ix - 17), hl
+	call	_trim
+	ld	iy, (ix - 17)
+	pop	hl
+	ld	e, (iy)
+	ld	a, e
+	cp	a, 34
+	jr	z, BB6_16
+	ld	a, e
+	cp	a, 39
+	jr	nz, BB6_20
+BB6_16:
+	inc	iy
+BB6_17:
+	ld	l, (iy)
+	ld	a, l
+	or	a, a
+	jr	z, BB6_23
+	ld	a, l
+	cp	a, e
+	jr	z, BB6_23
+	ld	(ix - 20), e
+	bit	0, (ix + 12)
+	ld	hl, 1
+	push	hl
+	push	iy
+	ld	(ix - 17), iy
+	call	nz, _linker_emit
+	pop	hl
+	pop	hl
+	ld	hl, (ix + 9)
+	push	hl
+	pop	iy
+	ld	hl, (iy)
+	inc	hl
+	ld	(iy), hl
+	ld	iy, (ix - 17)
+	inc	iy
+	ld	e, (ix - 20)
+	jr	BB6_17
+BB6_20:
+	or	a, a
+	sbc	hl, hl
+	push	hl
+	push	hl
+	push	iy
+	call	_strtoul
+	pop	de
+	pop	de
+	pop	de
+	bit	0, (ix + 12)
+	jr	z, BB6_22
+	ld	a, l
+	ld	(ix - 8), a
+	ld	hl, 1
+	push	hl
+	pea	ix - 8
+	call	_linker_emit
+	pop	hl
+	pop	hl
+BB6_22:
+	ld	hl, (ix + 9)
+	push	hl
+	pop	iy
+	ld	hl, (iy)
+	inc	hl
+	ld	(iy), hl
+BB6_23:
+	ld	hl, _.str.3
+	push	hl
+	ld	hl, 0
+	push	hl
+	call	_strtok
+	pop	de
+	pop	de
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jp	nz, BB6_14
+BB6_24:
+	ld	sp, ix
+	pop	ix
+	ret
+BB6_25:
+	push	hl
+	ld	(ix - 17), hl
+	call	_trim
+	pop	hl
+	ld	de, 0
+	ld	hl, (ix - 17)
+	ld	e, (hl)
+	push	de
+	call	_isalpha
+	pop	de
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jp	nz, BB6_27
+	or	a, a
+	sbc	hl, hl
+	push	hl
+	push	hl
+	ld	hl, (ix - 17)
+	push	hl
+	call	_strtoul
+	pop	de
+	pop	de
+	pop	de
+	ld	a, h
+	ld	e, (ix + 12)
+	jp	BB6_31
+BB6_27:
+	pea	ix - 8
+	ld	hl, (ix - 17)
+	push	hl
+	call	_find_label
+	pop	de
+	pop	de
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jr	nz, BB6_29
+	ld	e, (ix + 12)
+	bit	0, e
+	ld	hl, 0
+	jp	nz, BB6_42
+	jr	BB6_30
+BB6_29:
+	ld	hl, (ix - 8)
+	ld	e, (ix + 12)
+BB6_30:
+	ld	a, h
+BB6_31:
+	bit	0, e
+	jr	z, BB6_33
+	ld	(ix - 8), l
+	ld	(ix - 7), a
+	ld	hl, 2
+	push	hl
+	pea	ix - 8
+	call	_linker_emit
+	pop	hl
+	pop	hl
+BB6_33:
+	ld	hl, (ix + 9)
+	push	hl
+	pop	iy
+	ld	hl, (iy)
+	ld	de, 2
+	add	hl, de
+	ld	(iy), hl
+BB6_34:
+	ld	hl, _.str.3
+	push	hl
+	ld	hl, 0
+	push	hl
+	call	_strtok
+	pop	de
+	pop	de
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jp	z, BB6_24
+	jp	BB6_25
+BB6_35:
+	lea	de, ix - 8
+	or	a, a
+	sbc	hl, hl
+	ld	l, (iy + 8)
+	push	hl
+	pea	iy + 3
+	ld	(ix - 20), de
+	push	de
+	ld	(ix - 17), iy
+	call	_memcpy
+	ld	iy, (ix - 17)
+	pop	hl
+	pop	hl
+	pop	hl
+	ld	hl, (iy + 9)
+	dec	hl
+	ld	de, 3
+	or	a, a
+	sbc	hl, de
+	jp	nc, BB6_54
+	ld	hl, _.str.8
+	push	hl
+	ld	hl, 0
+	push	hl
+	call	_strtok
+	push	hl
+	pop	iy
+	pop	hl
+	pop	hl
+	lea	hl, iy
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jr	nz, BB6_38
+	ld	hl, _.str.9
+	jr	BB6_43
+BB6_38:
+	or	a, a
+	sbc	hl, hl
+	ld	(ix - 23), iy
+	ld	l, (iy)
+	push	hl
+	call	_isalpha
+	pop	de
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jr	nz, BB6_40
+	or	a, a
+	sbc	hl, hl
+	push	hl
+	push	hl
+	ld	hl, (ix - 23)
+	push	hl
+	call	_strtoul
+	push	hl
+	pop	iy
+	ld	a, e
+	pop	hl
+	pop	hl
+	pop	hl
+	ex	de, hl
+	ld	e, iyh
+	ex	de, hl
+	ld	(ix - 23), l
+	ld	l, 16
+	lea	bc, iy
+	call	__lshru
+	ld	(ix - 26), bc
+	ld	a, iyl
+	ld	iy, (ix - 17)
+	jr	BB6_46
+BB6_40:
+	pea	ix - 11
+	ld	hl, (ix - 23)
+	push	hl
+	call	_find_label
+	pop	de
+	pop	de
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jr	nz, BB6_44
+	bit	0, (ix + 12)
+	ld	iy, (ix - 17)
+	jr	z, BB6_45
+BB6_42:
+	ld	hl, _.str.6
+BB6_43:
+	push	hl
+	call	_os_PutStrFull
+	pop	hl
+	jp	BB6_24
+BB6_44:
+	ld	hl, (ix - 11)
+	ld	(ix - 14), hl
+	ld	iy, (ix - 17)
+BB6_45:
+	xor	a, a
+	ld	de, (ix - 14)
+	ld	l, d
+	ld	(ix - 23), l
+	ld	l, 16
+	push	de
+	pop	bc
+	call	__lshru
+	ld	(ix - 26), bc
+	ld	a, e
+BB6_46:
+	ld	de, (iy + 9)
+	ld	bc, 1
+	push	de
+	pop	hl
+	or	a, a
+	sbc	hl, bc
+	jr	nz, BB6_48
+	ld	de, 0
+	ld	e, (iy + 8)
+	ld	bc, (ix - 20)
+	jr	BB6_53
+BB6_48:
+	ld	bc, 2
+	push	de
+	pop	hl
+	or	a, a
+	sbc	hl, bc
+	jr	nz, BB6_50
+	ld	de, 0
+	ld	e, (iy + 8)
+	ld	l, a
+	ld	a, (ix - 23)
+	jr	BB6_52
+BB6_50:
+	ex	de, hl
+	ld	de, 3
+	or	a, a
+	sbc	hl, de
+	jr	nz, BB6_54
+	ld	de, 0
+	ld	e, (iy + 8)
+	ld	iy, (ix - 20)
+	add	iy, de
+	ld	(iy - 3), a
+	ld	l, (ix - 23)
+	ld	bc, (ix - 26)
+	ld	a, c
+BB6_52:
+	ld	bc, (ix - 20)
+	push	bc
+	pop	iy
+	add	iy, de
+	ld	(iy - 2), l
+BB6_53:
+	push	bc
+	pop	iy
+	add	iy, de
+	ld	(iy - 1), a
+	ld	iy, (ix - 17)
+BB6_54:
+	bit	0, (ix + 12)
+	jr	z, BB6_57
+	ld	l, (iy + 8)
+	push	hl
+	ld	hl, (ix - 20)
+	push	hl
+	call	_linker_emit
+	ld	iy, (ix - 17)
+	pop	de
+	pop	de
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jr	nz, BB6_57
+	ld	hl, _.str.10
+	push	hl
+	call	_os_PutStrFull
+	ld	iy, (ix - 17)
+	pop	hl
+BB6_57:
+	or	a, a
+	sbc	hl, hl
+	ex	de, hl
+	ld	e, (iy + 8)
+	ld	hl, (ix + 9)
+	push	hl
+	pop	iy
+	ld	hl, (iy)
+	add	hl, de
+	ld	(iy), hl
+	jp	BB6_24
+	section	.text,"ax",@progbits
+
+	section	.text,"ax",@progbits
+	public	_print_version
+_print_version:
+	ld	hl, -35
+	call	__frameset
+	ld	iy, _.str.11
+	ld	bc, 1
+	ld	de, 0
+	lea	hl, ix - 32
+	ld	(ix - 35), hl
+	push	de
+	push	bc
+	push	iy
+	ld	de, 32
+	push	de
+	push	hl
+	call	_snprintf
+	pop	hl
+	pop	hl
+	pop	hl
+	pop	hl
+	pop	hl
+	ld	hl, (ix - 35)
+	push	hl
+	call	_os_PutStrFull
+	pop	hl
+	ld	iy, -3145600
+	call	_os_NewLine
+	ld	hl, _.str.12
+	push	hl
+	call	_os_PutStrFull
+	pop	hl
+	ld	iy, -3145600
+	call	_os_NewLine
+	ld	hl, 10
+	push	hl
+	call	_delay
+	pop	hl
+BB7_1:
+	call	_os_GetCSC
+	or	a, a
+	jr	z, BB7_1
+	ld	sp, ix
+	pop	ix
+	ret
+	section	.text,"ax",@progbits
+
+	section	.text,"ax",@progbits
+	public	_main
+_main:
+	ld	hl, -284
+	call	__frameset
+	ld	de, 0
+	ld.sis	bc, 0
+	ld	hl, _stored_count
+	ld	iy, _capacity
+	ld	(_stored_lines), de
+	ld	(hl), c
+	inc	hl
+	ld	(hl), b
+	ld	(iy), c
+	ld	(iy + 1), b
+	ld	iy, -3145600
+	call	_os_ClrLCD
+	call	_os_HomeUp
+	call	_os_DrawStatusBar
+	call	_print_version
+	ld	hl, 53248
+	ld	(_code_ptr), hl
+	or	a, a
+	sbc	hl, hl
+	ld	(_code_size), hl
+	ld	hl, _.str.14
+	push	hl
+	ld	hl, _.str.13
+	push	hl
+	call	_ti_Open
+	ld	e, a
+	pop	hl
+	pop	hl
+	or	a, a
+	jr	nz, BB8_3
+	ld	hl, _.str.15
+	push	hl
+	call	_os_PutStrFull
+	pop	hl
+	ld	iy, -3145600
+	call	_os_NewLine
+	ld	hl, _.str.12
+	push	hl
+	call	_os_PutStrFull
+	pop	hl
+	ld	iy, -3145600
+	call	_os_NewLine
+BB8_2:
+	call	_os_GetCSC
+	or	a, a
+	jr	z, BB8_2
+	jp	BB8_34
+BB8_3:
+	lea	hl, ix - 10
+	ld	bc, -278
+	lea	iy, ix
+	add	iy, bc
+	ld	(iy), hl
+	ld	bc, -266
+	lea	hl, ix
+	add	hl, bc
+	push	ix
+	ld	bc, -275
+	add	ix, bc
+	ld	(ix), hl
+	pop	ix
+	xor	a, a
+	ld	bc, -272
+	lea	hl, ix
+	add	hl, bc
+	ld	(hl), de
+BB8_4:
+	ld	bc, -269
+	lea	hl, ix
+	add	hl, bc
+	ld	(hl), a
+	push	de
+	ld	hl, 1
+	push	hl
+	push	hl
+	pea	ix - 7
+	call	_ti_Read
+	pop	de
+	pop	de
+	pop	de
+	pop	de
+	ld	de, 1
+	or	a, a
+	sbc	hl, de
+	jp	nz, BB8_16
+	ld	de, -269
+	lea	hl, ix
+	add	hl, de
+	ld	l, (hl)
+	ld	c, (ix - 7)
+	ld	a, c
+	cp	a, 10
+	jr	z, BB8_7
+	ld	a, c
+	cp	a, 13
+	jr	nz, BB8_10
+BB8_7:
+	ld	a, l
+	or	a, a
+	ld	a, 0
+	ld	bc, -272
+	lea	iy, ix
+	push	af
+	add	iy, bc
+	pop	af
+	ld	de, (iy)
+	jr	z, BB8_4
+	ld	de, 0
+	ld	bc, -281
+	lea	iy, ix
+	add	iy, bc
+	ld	(iy), de
+	ld	e, l
+	ld	(ix - 3), de
+	ld	de, -275
+	lea	hl, ix
+	add	hl, de
+	ld	bc, (hl)
+	push	bc
+	pop	hl
+	ld	de, (ix - 3)
+	add	hl, de
+	ld	(hl), 0
+	ld	hl, _stored_count
+	ld	iy, (hl)
+	ld	hl, _capacity
+	ld	de, (hl)
+	ex	de, hl
+	ld	e, iyl
+	ld	d, iyh
+	ex	de, hl
+	or	a, a
+	sbc.sis	hl, de
+	jr	nc, BB8_12
+	ld	de, -281
+	lea	hl, ix
+	add	hl, de
+	ld	hl, (hl)
+	ex	de, hl
+	ld	e, iyl
+	ld	d, iyh
+	ex	de, hl
+	lea	iy, ix
+	add	iy, de
+	ld	(iy), hl
+	ld	hl, (_stored_lines)
+	push	ix
+	ld	de, -269
+	add	ix, de
+	ld	(ix), hl
+	jp	BB8_14
+BB8_10:
+	ex	de, hl
+	ld	iyl, e
+	ex	de, hl
+	ld	a, iyl
+	cp	a, -1
+	ld	a, -1
+	ld	(ix - 3), bc
+	ld	bc, -272
+	lea	hl, ix
+	push	af
+	add	hl, bc
+	pop	af
+	ld	de, (hl)
+	ld	bc, (ix - 3)
+	jp	z, BB8_4
+	ld	a, c
+	ld	bc, 0
+	ld	c, iyl
+	inc	iyl
+	ld	(ix - 3), de
+	ld	de, -275
+	lea	hl, ix
+	add	hl, de
+	ld	hl, (hl)
+	add	hl, bc
+	ld	(hl), a
+	ld	a, iyl
+	ld	de, (ix - 3)
+	jp	BB8_4
+BB8_12:
+	or	a, a
+	sbc	hl, hl
+	ld	l, e
+	ld	h, d
+	ld	de, 341
+	add	hl, de
+	ld	de, (_stored_lines)
+	ld	bc, -281
+	lea	iy, ix
+	add	iy, bc
+	ld	(iy), hl
+	ld	bc, 3
+	call	__imulu
+	push	hl
+	push	de
+	call	_realloc
+	pop	de
+	pop	de
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jp	z, BB8_22
+	ld	bc, -269
+	lea	iy, ix
+	add	iy, bc
+	ld	(iy), hl
+	ld	(_stored_lines), hl
+	ld	hl, _capacity
+	push	ix
+	ld	bc, -281
+	add	ix, bc
+	ld	de, (ix)
+	pop	ix
+	ld	(hl), e
+	inc	hl
+	ld	(hl), d
+	ld	hl, _stored_count
+	ld	hl, (hl)
+	ld	de, 0
+	ld	e, l
+	ld	d, h
+	lea	hl, ix
+	add	hl, bc
+	ld	(hl), de
+	push	ix
+	ld	de, -275
+	add	ix, de
+	ld	bc, (ix)
+BB8_14:
+	pop	ix
+	push	bc
+	call	_strlen
+	pop	de
+	inc	hl
+	ld	bc, -284
+	lea	iy, ix
+	add	iy, bc
+	ld	(iy), hl
+	push	hl
+	call	_malloc
+	push	hl
+	pop	de
+	pop	hl
+	ld	bc, -281
+	lea	hl, ix
+	add	hl, bc
+	ld	hl, (hl)
+	ld	bc, 3
+	call	__imulu
+	push	hl
+	pop	bc
+	ld	(ix - 3), de
+	ld	de, -269
+	lea	iy, ix
+	add	iy, de
+	ld	hl, (iy)
+	add	hl, bc
+	ld	de, (ix - 3)
+	ld	(hl), de
+	ld	hl, (_stored_lines)
+	add	hl, bc
+	ld	hl, (hl)
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jp	z, BB8_22
+	ld	bc, -284
+	lea	iy, ix
+	add	iy, bc
+	ld	de, (iy)
+	push	de
+	push	ix
+	ld	bc, -275
+	add	ix, bc
+	ld	de, (ix)
+	pop	ix
+	push	de
+	push	hl
+	call	_memcpy
+	pop	hl
+	pop	hl
+	pop	hl
+	ld	hl, _stored_count
+	push	hl
+	pop	iy
+	ld	hl, (iy)
+	inc.sis	hl
+	ld	(iy), l
+	ld	(iy + 1), h
+	xor	a, a
+	ld	bc, -272
+	lea	hl, ix
+	add	hl, bc
+	ld	de, (hl)
+	jp	BB8_4
+BB8_16:
+	ld	bc, -269
+	lea	hl, ix
+	add	hl, bc
+	ld	l, (hl)
+	ld	a, l
+	or	a, a
+	jp	z, BB8_24
+	ld	de, 0
+	ld	bc, -281
+	lea	iy, ix
+	add	iy, bc
+	ld	(iy), de
+	ld	e, l
+	ld	(ix - 3), de
+	ld	de, -275
+	lea	hl, ix
+	add	hl, de
+	ld	bc, (hl)
+	push	bc
+	pop	hl
+	ld	de, (ix - 3)
+	add	hl, de
+	ld	(hl), 0
+	ld	hl, _stored_count
+	ld	iy, (hl)
+	ld	hl, _capacity
+	ld	de, (hl)
+	ex	de, hl
+	ld	e, iyl
+	ld	d, iyh
+	ex	de, hl
+	or	a, a
+	sbc.sis	hl, de
+	jr	nc, BB8_19
+	ld	de, -281
+	lea	hl, ix
+	add	hl, de
+	ld	hl, (hl)
+	ex	de, hl
+	ld	e, iyl
+	ld	d, iyh
+	ex	de, hl
+	lea	iy, ix
+	add	iy, de
+	ld	(iy), hl
+	ld	hl, (_stored_lines)
+	push	ix
+	ld	de, -269
+	add	ix, de
+	ld	(ix), hl
+	jr	BB8_21
+BB8_19:
+	or	a, a
+	sbc	hl, hl
+	ld	l, e
+	ld	h, d
+	ld	de, 341
+	add	hl, de
+	ld	de, (_stored_lines)
+	ld	bc, -281
+	lea	iy, ix
+	add	iy, bc
+	ld	(iy), hl
+	ld	bc, 3
+	call	__imulu
+	push	hl
+	push	de
+	call	_realloc
+	pop	de
+	pop	de
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jp	z, BB8_22
+	ld	bc, -269
+	lea	iy, ix
+	add	iy, bc
+	ld	(iy), hl
+	ld	(_stored_lines), hl
+	ld	hl, _capacity
+	push	ix
+	ld	bc, -281
+	add	ix, bc
+	ld	de, (ix)
+	pop	ix
+	ld	(hl), e
+	inc	hl
+	ld	(hl), d
+	ld	hl, _stored_count
+	ld	hl, (hl)
+	ld	de, 0
+	ld	e, l
+	ld	d, h
+	lea	hl, ix
+	add	hl, bc
+	ld	(hl), de
+	push	ix
+	ld	de, -275
+	add	ix, de
+	ld	bc, (ix)
+BB8_21:
+	pop	ix
+	push	bc
+	call	_strlen
+	pop	de
+	inc	hl
+	ld	bc, -284
+	lea	iy, ix
+	add	iy, bc
+	ld	(iy), hl
+	push	hl
+	call	_malloc
+	push	hl
+	pop	de
+	pop	hl
+	ld	bc, 3
+	ld	(ix - 3), de
+	ld	de, -281
+	lea	hl, ix
+	add	hl, de
+	ld	hl, (hl)
+	call	__imulu
+	push	hl
+	pop	bc
+	ld	de, -269
+	lea	iy, ix
+	add	iy, de
+	ld	hl, (iy)
+	add	hl, bc
+	ld	de, (ix - 3)
+	ld	(hl), de
+	ld	hl, (_stored_lines)
+	add	hl, bc
+	ld	hl, (hl)
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jr	nz, BB8_23
+BB8_22:
+	ld	hl, -114
+	push	hl
+	call	_os_ThrowError
+	pop	hl
+BB8_23:
+	ld	bc, -284
+	lea	iy, ix
+	add	iy, bc
+	ld	de, (iy)
+	push	de
+	push	ix
+	ld	bc, -275
+	add	ix, bc
+	ld	de, (ix)
+	pop	ix
+	push	de
+	push	hl
+	call	_memcpy
+	pop	hl
+	pop	hl
+	pop	hl
+	ld	hl, _stored_count
+	push	hl
+	pop	iy
+	ld	hl, (iy)
+	inc.sis	hl
+	ld	(iy), l
+	ld	(iy + 1), h
+BB8_24:
+	ld	bc, -272
+	lea	hl, ix
+	add	hl, bc
+	ld	hl, (hl)
+	push	hl
+	call	_ti_Close
+	pop	hl
+	or	a, a
+	sbc	hl, hl
+	ld	(ix - 10), hl
+	ld	bc, -272
+	lea	iy, ix
+	add	iy, bc
+	ld	(iy), hl
+	push	ix
+	ld	bc, -269
+	add	ix, bc
+	ld	(ix), hl
+	pop	ix
+	ld	iy, _stored_count
+BB8_25:
+	ld	iy, (iy)
+	push	hl
+	pop	bc
+	push	bc
+	pop	de
+	ld	e, iyl
+	ld	d, iyh
+	ld	(ix - 3), bc
+	ld	bc, -269
+	lea	hl, ix
+	add	hl, bc
+	ld	hl, (hl)
+	or	a, a
+	sbc	hl, de
+	ld	bc, (ix - 3)
+	jr	nc, BB8_27
+	ld	hl, (_stored_lines)
+	ld	bc, -272
+	lea	iy, ix
+	add	iy, bc
+	ld	de, (iy)
+	add	hl, de
+	ld	hl, (hl)
+	ld	de, 0
+	push	de
+	push	ix
+	ld	bc, -278
+	add	ix, bc
+	ld	de, (ix)
+	pop	ix
+	push	de
+	push	hl
+	call	_assemble_line
+	ld	iy, _stored_count
+	pop	hl
+	pop	hl
+	pop	hl
+	ld	bc, -269
+	lea	hl, ix
+	add	hl, bc
+	ld	hl, (hl)
+	inc	hl
+	push	ix
+	add	ix, bc
+	ld	(ix), hl
+	pop	ix
+	ld	de, 3
+	ld	bc, -272
+	lea	hl, ix
+	add	hl, bc
+	ld	hl, (hl)
+	add	hl, de
+	push	ix
+	add	ix, bc
+	ld	(ix), hl
+	pop	ix
+	or	a, a
+	sbc	hl, hl
+	jp	BB8_25
+BB8_27:
+	push	bc
+	pop	de
+	ld	e, iyl
+	ld	d, iyh
+	ld	(ix - 10), bc
+	push	bc
+	pop	iy
+BB8_28:
+	push	bc
+	pop	hl
+	or	a, a
+	sbc	hl, de
+	jp	nc, BB8_30
+	ld	hl, (_stored_lines)
+	lea	de, iy
+	add	hl, de
+	ld	hl, (hl)
+	ld	de, 1
+	push	de
+	ld	(ix - 3), bc
+	push	ix
+	ld	bc, -278
+	add	ix, bc
+	ld	de, (ix)
+	pop	ix
+	push	de
+	push	hl
+	ld	de, -272
+	lea	hl, ix
+	add	hl, de
+	ld	(hl), iy
+	ld	bc, (ix - 3)
+	ld	de, -269
+	lea	iy, ix
+	add	iy, de
+	ld	(iy), bc
+	call	_assemble_line
+	ld	bc, -272
+	lea	hl, ix
+	add	hl, bc
+	ld	iy, (hl)
+	pop	hl
+	pop	hl
+	pop	hl
+	ld	bc, -269
+	lea	hl, ix
+	add	hl, bc
+	ld	hl, (hl)
+	inc	hl
+	push	ix
+	add	ix, bc
+	ld	(ix), hl
+	pop	ix
+	ld	hl, _stored_count
+	ld	hl, (hl)
+	ld	de, 0
+	ld	e, l
+	ld	d, h
+	ld	bc, 3
+	add	iy, bc
+	ld	(ix - 3), de
+	ld	de, -269
+	lea	hl, ix
+	add	hl, de
+	ld	bc, (hl)
+	ld	de, (ix - 3)
+	jp	BB8_28
+BB8_30:
+	ld	hl, _.str.16
+	push	hl
+	call	_os_PutStrFull
+	pop	hl
+	ld	iy, -3145600
+	call	_os_NewLine
+	ld	hl, 100
+	push	hl
+	call	_delay
+	pop	hl
+	ld	hl, _.str.17
+	push	hl
+	call	_os_PutStrFull
+	pop	hl
+	ld	iy, -3145600
+	call	_os_NewLine
+	ld	de, 0
+	ld	bc, -272
+	lea	hl, ix
+	add	hl, bc
+	ld	(hl), de
+	push	ix
+	ld	bc, -269
+	add	ix, bc
+	ld	(ix), de
+	pop	ix
+BB8_31:
+	ld	hl, _stored_count
+	ld	bc, (hl)
+	ld	e, c
+	ld	d, b
+	ld	iy, (_stored_lines)
+	ld	bc, -269
+	lea	hl, ix
+	add	hl, bc
+	ld	hl, (hl)
+	or	a, a
+	sbc	hl, de
+	jr	nc, BB8_33
+	ld	bc, -272
+	lea	hl, ix
+	add	hl, bc
+	ld	de, (hl)
+	add	iy, de
+	ld	hl, (iy)
+	push	hl
+	call	_free
+	pop	hl
+	ld	bc, -269
+	lea	hl, ix
+	add	hl, bc
+	ld	hl, (hl)
+	inc	hl
+	lea	iy, ix
+	add	iy, bc
+	ld	(iy), hl
+	ld	de, 3
+	ld	bc, -272
+	lea	hl, ix
+	add	hl, bc
+	ld	hl, (hl)
+	add	hl, de
+	push	ix
+	add	ix, bc
+	ld	(ix), hl
+	pop	ix
+	ld	de, 0
+	jr	BB8_31
+BB8_33:
+	push	iy
+	call	_free
+	pop	hl
+	ld	hl, _.str.18
+	push	hl
+	call	_os_PutStrFull
+	pop	hl
+	ld	iy, -3145600
+	call	_os_NewLine
+	ld	hl, 10
+	push	hl
+	call	_delay
+	pop	hl
+	ld	hl, _.str.19
+	push	hl
+	call	_os_PutStrFull
+	pop	hl
+	ld	iy, -3145600
+	call	_os_NewLine
+	ld	hl, 10
+	push	hl
+	call	_delay
+	pop	hl
+	call	_linker_run
+BB8_34:
+	or	a, a
+	sbc	hl, hl
+	ld	sp, ix
+	pop	ix
+	ret
+	section	.text,"ax",@progbits
+
+	section	.text,"ax",@progbits
+	public	_lookup_instruction
+_lookup_instruction:
+	ld	hl, -6
+	call	__frameset
+	ld	de, (ix + 6)
+	ld	bc, 12
+	ld	iy, _instruction_table
+	or	a, a
+	sbc	hl, hl
+BB9_1:
+	ld	(ix - 3), hl
+	add	hl, bc
+	ld	(ix - 6), hl
+	ld	bc, 4032
+	or	a, a
+	sbc	hl, bc
+	jr	z, BB9_4
+	ld	bc, (ix - 3)
+	add	iy, bc
+	ld	hl, (iy)
+	push	hl
+	push	de
+	call	_strcasecmp
+	ld	bc, 12
+	ld	iy, _instruction_table
+	pop	de
+	pop	de
+	ld	de, (ix + 6)
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	ld	hl, (ix - 6)
+	jr	nz, BB9_1
+	ld	de, (ix - 3)
+	add	iy, de
+	jr	BB9_5
+BB9_4:
+	ld	iy, 0
+BB9_5:
+	lea	hl, iy
+	ld	sp, ix
+	pop	ix
+	ret
+	section	.text,"ax",@progbits
+
+	section	.data,"aw",@progbits
+	private	_code_ptr
+_code_ptr:
+	dl	53248
+
+	section	.bss,"aw",@nobits
+	private	_code_size
+_code_size:
+	rb	3
+
+	section	.rodata,"a",@progbits
+	private	_.str
+_.str:
+	db	"BUILT", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.1
+_.str.1:
+	db	"w", 0
+
+	section	.bss,"aw",@nobits
+	public	_stored_lines
+_stored_lines:
+	rb	3
+
+	section	.bss,"aw",@nobits
+	public	_stored_count
+_stored_count:
+	rb	2
+
+	section	.bss,"aw",@nobits
+	public	_capacity
+_capacity:
+	rb	2
+
+	section	.bss,"aw",@nobits
+	public	_label_count
+_label_count:
+	rb	1
+
+	section	.bss,"aw",@nobits
+	public	_labels
+_labels:
+	rb	1216
+
+	section	.rodata,"a",@progbits
+	private	_.str.2
+_.str.2:
+	db	" ", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.1.3
+_.str.1.3:
+	db	".db", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.2.4
+_.str.2.4:
+	db	"db", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.3
+_.str.3:
+	db	",", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.4
+_.str.4:
+	db	".dw", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.5
+_.str.5:
+	db	"dw", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.6
+_.str.6:
+	db	"Undefined label", 10, 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.7
+_.str.7:
+	db	"Unknown instruction", 10, 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.8
+_.str.8:
+	db	" ,", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.9
+_.str.9:
+	db	"Missing operand", 10, 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.10
+_.str.10:
+	db	"Code buffer full", 10, 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.11
+_.str.11:
+	db	"ON-CALC ASSEMBLER %d.%d ", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.12
+_.str.12:
+	db	"Press Any Key...", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.13
+_.str.13:
+	db	"ASRC", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.14
+_.str.14:
+	db	"r", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.15
+_.str.15:
+	db	"File not found", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.16
+_.str.16:
+	db	"Build complete", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.17
+_.str.17:
+	db	"Collecting Memory...", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.18
+_.str.18:
+	db	"Collected Memory.", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.19
+_.str.19:
+	db	"Launching Program...", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.20
+_.str.20:
+	db	"ld a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.1.21
+_.str.1.21:
+	db	"ld b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.2.22
+_.str.2.22:
+	db	"ld c", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.3.23
+_.str.3.23:
+	db	"ld d", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.4.24
+_.str.4.24:
+	db	"ld e", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.5.25
+_.str.5.25:
+	db	"ld h", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.6.26
+_.str.6.26:
+	db	"ld l", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.7.27
+_.str.7.27:
+	db	"add a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.8.28
+_.str.8.28:
+	db	"sub", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.9.29
+_.str.9.29:
+	db	"and", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.10.30
+_.str.10.30:
+	db	"or", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.11.31
+_.str.11.31:
+	db	"xor", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.12.32
+_.str.12.32:
+	db	"inc a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.13.33
+_.str.13.33:
+	db	"dec a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.14.34
+_.str.14.34:
+	db	"jp", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.15.35
+_.str.15.35:
+	db	"call", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.16.36
+_.str.16.36:
+	db	"ret", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.17.37
+_.str.17.37:
+	db	"nop", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.18.38
+_.str.18.38:
+	db	"halt", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.19.39
+_.str.19.39:
+	db	"push af", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.20.40
+_.str.20.40:
+	db	"pop af", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.21
+_.str.21:
+	db	"push bc", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.22
+_.str.22:
+	db	"pop bc", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.23
+_.str.23:
+	db	"push de", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.24
+_.str.24:
+	db	"pop de", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.25
+_.str.25:
+	db	"push hl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.26
+_.str.26:
+	db	"pop hl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.27
+_.str.27:
+	db	"ld (hl),n", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.28
+_.str.28:
+	db	"ld a,(hl)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.29
+_.str.29:
+	db	"ld (hl),a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.30
+_.str.30:
+	db	"ld a,b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.31
+_.str.31:
+	db	"ld a,c", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.32
+_.str.32:
+	db	"ld a,d", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.33
+_.str.33:
+	db	"ld a,e", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.34
+_.str.34:
+	db	"ld a,h", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.35
+_.str.35:
+	db	"ld a,l", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.36
+_.str.36:
+	db	"inc b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.37
+_.str.37:
+	db	"dec b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.38
+_.str.38:
+	db	"inc c", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.39
+_.str.39:
+	db	"dec c", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.40
+_.str.40:
+	db	"add a,b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.41
+_.str.41:
+	db	"add a,c", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.42
+_.str.42:
+	db	"add a,d", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.43
+_.str.43:
+	db	"add a,e", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.44
+_.str.44:
+	db	"sub b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.45
+_.str.45:
+	db	"sub c", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.46
+_.str.46:
+	db	"and b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.47
+_.str.47:
+	db	"and c", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.48
+_.str.48:
+	db	"or b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.49
+_.str.49:
+	db	"or c", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.50
+_.str.50:
+	db	"xor b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.51
+_.str.51:
+	db	"xor c", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.52
+_.str.52:
+	db	"ld bc,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.53
+_.str.53:
+	db	"ld de,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.54
+_.str.54:
+	db	"ld hl,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.55
+_.str.55:
+	db	"ld sp,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.56
+_.str.56:
+	db	"jr e", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.57
+_.str.57:
+	db	"jr nz,e", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.58
+_.str.58:
+	db	"jr z,e", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.59
+_.str.59:
+	db	"jr nc,e", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.60
+_.str.60:
+	db	"jr c,e", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.61
+_.str.61:
+	db	"ld a,(bc)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.62
+_.str.62:
+	db	"ld a,(de)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.63
+_.str.63:
+	db	"ld (bc),a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.64
+_.str.64:
+	db	"ld (de),a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.65
+_.str.65:
+	db	"add hl,bc", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.66
+_.str.66:
+	db	"add hl,de", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.67
+_.str.67:
+	db	"add hl,hl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.68
+_.str.68:
+	db	"add hl,sp", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.69
+_.str.69:
+	db	"rlca", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.70
+_.str.70:
+	db	"rrca", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.71
+_.str.71:
+	db	"rla", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.72
+_.str.72:
+	db	"rra", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.73
+_.str.73:
+	db	"cp a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.74
+_.str.74:
+	db	"cp b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.75
+_.str.75:
+	db	"cp c", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.76
+_.str.76:
+	db	"cp d", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.77
+_.str.77:
+	db	"sbc a,b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.78
+_.str.78:
+	db	"sbc a,c", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.79
+_.str.79:
+	db	"sbc a,d", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.80
+_.str.80:
+	db	"sbc a,e", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.81
+_.str.81:
+	db	"sbc a,h", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.82
+_.str.82:
+	db	"sbc a,l", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.83
+_.str.83:
+	db	"sbc a,a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.84
+_.str.84:
+	db	"sbc a,n", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.85
+_.str.85:
+	db	"inc ix", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.86
+_.str.86:
+	db	"dec ix", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.87
+_.str.87:
+	db	"inc iy", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.88
+_.str.88:
+	db	"dec iy", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.89
+_.str.89:
+	db	"ld sp,hl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.90
+_.str.90:
+	db	"ld sp,ix", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.91
+_.str.91:
+	db	"ld sp,iy", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.92
+_.str.92:
+	db	"push ix", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.93
+_.str.93:
+	db	"pop ix", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.94
+_.str.94:
+	db	"push iy", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.95
+_.str.95:
+	db	"pop iy", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.96
+_.str.96:
+	db	"ldi", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.97
+_.str.97:
+	db	"ldd", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.98
+_.str.98:
+	db	"ldir", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.99
+_.str.99:
+	db	"lddr", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.100
+_.str.100:
+	db	"cpi", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.101
+_.str.101:
+	db	"cpd", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.102
+_.str.102:
+	db	"cpir", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.103
+_.str.103:
+	db	"cpdr", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.104
+_.str.104:
+	db	"bit 0,b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.105
+_.str.105:
+	db	"bit 7,a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.106
+_.str.106:
+	db	"set 0,b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.107
+_.str.107:
+	db	"res 0,b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.108
+_.str.108:
+	db	"ret nz", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.109
+_.str.109:
+	db	"ret z", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.110
+_.str.110:
+	db	"ret nc", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.111
+_.str.111:
+	db	"ret c", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.112
+_.str.112:
+	db	"call nz,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.113
+_.str.113:
+	db	"call z,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.114
+_.str.114:
+	db	"call nc,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.115
+_.str.115:
+	db	"call c,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.116
+_.str.116:
+	db	"add a,h", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.117
+_.str.117:
+	db	"add a,l", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.118
+_.str.118:
+	db	"sub d", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.119
+_.str.119:
+	db	"sub e", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.120
+_.str.120:
+	db	"sub h", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.121
+_.str.121:
+	db	"sub l", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.122
+_.str.122:
+	db	"rl b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.123
+_.str.123:
+	db	"rr b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.124
+_.str.124:
+	db	"sla b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.125
+_.str.125:
+	db	"sra b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.126
+_.str.126:
+	db	"srl b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.127
+_.str.127:
+	db	"bit 1,c", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.128
+_.str.128:
+	db	"set 1,c", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.129
+_.str.129:
+	db	"res 1,c", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.130
+_.str.130:
+	db	"ld a,(nn)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.131
+_.str.131:
+	db	"ld (nn),a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.132
+_.str.132:
+	db	"and d", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.133
+_.str.133:
+	db	"and e", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.134
+_.str.134:
+	db	"and h", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.135
+_.str.135:
+	db	"and l", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.136
+_.str.136:
+	db	"or d", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.137
+_.str.137:
+	db	"or e", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.138
+_.str.138:
+	db	"or h", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.139
+_.str.139:
+	db	"or l", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.140
+_.str.140:
+	db	"xor d", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.141
+_.str.141:
+	db	"xor e", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.142
+_.str.142:
+	db	"xor h", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.143
+_.str.143:
+	db	"xor l", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.144
+_.str.144:
+	db	"cp e", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.145
+_.str.145:
+	db	"cp h", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.146
+_.str.146:
+	db	"cp l", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.147
+_.str.147:
+	db	"ld a,(ix+0)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.148
+_.str.148:
+	db	"ld (ix+0),a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.149
+_.str.149:
+	db	"ld a,(iy+0)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.150
+_.str.150:
+	db	"ld (iy+0),a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.151
+_.str.151:
+	db	"di", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.152
+_.str.152:
+	db	"ei", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.153
+_.str.153:
+	db	"cpl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.154
+_.str.154:
+	db	"scf", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.155
+_.str.155:
+	db	"ccf", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.156
+_.str.156:
+	db	"ex de,hl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.157
+_.str.157:
+	db	"ex af,af'", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.158
+_.str.158:
+	db	"exx", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.159
+_.str.159:
+	db	"ex (sp),hl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.160
+_.str.160:
+	db	"ex (sp),ix", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.161
+_.str.161:
+	db	"ex (sp),iy", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.162
+_.str.162:
+	db	"in a,(n)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.163
+_.str.163:
+	db	"out (n),a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.164
+_.str.164:
+	db	"add a,(ix+0)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.165
+_.str.165:
+	db	"sub (ix+0)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.166
+_.str.166:
+	db	"add a,(iy+0)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.167
+_.str.167:
+	db	"sub (iy+0)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.168
+_.str.168:
+	db	"rst 00h", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.169
+_.str.169:
+	db	"rst 08h", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.170
+_.str.170:
+	db	"rst 10h", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.171
+_.str.171:
+	db	"rst 18h", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.172
+_.str.172:
+	db	"ld hl,(nnnnnn)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.173
+_.str.173:
+	db	"ld (nnnnnn),hl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.174
+_.str.174:
+	db	"ld de,(nnnnnn)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.175
+_.str.175:
+	db	"ld (nnnnnn),de", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.176
+_.str.176:
+	db	"ld sp,(nnnnnn)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.177
+_.str.177:
+	db	"ld (nnnnnn),sp", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.178
+_.str.178:
+	db	"adc hl,sp", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.179
+_.str.179:
+	db	"sbc hl,sp", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.180
+_.str.180:
+	db	"ld a,(ix+nn)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.181
+_.str.181:
+	db	"ld (ix+nn),a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.182
+_.str.182:
+	db	"ld a,(iy+nn)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.183
+_.str.183:
+	db	"ld (iy+nn),a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.184
+_.str.184:
+	db	"mlt bc", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.185
+_.str.185:
+	db	"mlt de", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.186
+_.str.186:
+	db	"mlt hl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.187
+_.str.187:
+	db	"mlt sp", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.188
+_.str.188:
+	db	"swapnib a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.189
+_.str.189:
+	db	"ldirx", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.190
+_.str.190:
+	db	"lddrx", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.191
+_.str.191:
+	db	"cpirx", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.192
+_.str.192:
+	db	"cpdrx", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.193
+_.str.193:
+	db	"ld bc,nnnnnn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.194
+_.str.194:
+	db	"ld de,nnnnnn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.195
+_.str.195:
+	db	"ld hl,nnnnnn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.196
+_.str.196:
+	db	"ld sp,nnnnnn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.197
+_.str.197:
+	db	"adc hl,bc", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.198
+_.str.198:
+	db	"adc hl,de", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.199
+_.str.199:
+	db	"adc hl,hl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.200
+_.str.200:
+	db	"tst a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.201
+_.str.201:
+	db	"tst b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.202
+_.str.202:
+	db	"tst c", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.203
+_.str.203:
+	db	"push nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.204
+_.str.204:
+	db	"push nnnnnn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.205
+_.str.205:
+	db	"jp nz,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.206
+_.str.206:
+	db	"jp z,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.207
+_.str.207:
+	db	"jp nc,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.208
+_.str.208:
+	db	"jp c,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.209
+_.str.209:
+	db	"call po,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.210
+_.str.210:
+	db	"call pe,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.211
+_.str.211:
+	db	"call p,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.212
+_.str.212:
+	db	"call m,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.213
+_.str.213:
+	db	"ret po", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.214
+_.str.214:
+	db	"ret pe", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.215
+_.str.215:
+	db	"ret p", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.216
+_.str.216:
+	db	"ret m", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.217
+_.str.217:
+	db	"ld hl,(nn)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.218
+_.str.218:
+	db	"ld (nn),hl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.219
+_.str.219:
+	db	"lea bc,ix+nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.220
+_.str.220:
+	db	"lea bc,iy+nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.221
+_.str.221:
+	db	"lea de,ix+nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.222
+_.str.222:
+	db	"lea de,iy+nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.223
+_.str.223:
+	db	"lea hl,ix+nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.224
+_.str.224:
+	db	"lea hl,iy+nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.225
+_.str.225:
+	db	"lea sp,ix+nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.226
+_.str.226:
+	db	"lea sp,iy+nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.227
+_.str.227:
+	db	"ld ix,nnnnnn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.228
+_.str.228:
+	db	"ld iy,nnnnnn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.229
+_.str.229:
+	db	"ld ix,(nnnnnn)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.230
+_.str.230:
+	db	"ld iy,(nnnnnn)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.231
+_.str.231:
+	db	"ld (nnnnnn),ix", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.232
+_.str.232:
+	db	"ld (nnnnnn),iy", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.233
+_.str.233:
+	db	"ini", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.234
+_.str.234:
+	db	"ind", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.235
+_.str.235:
+	db	"outi", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.236
+_.str.236:
+	db	"outd", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.237
+_.str.237:
+	db	"inir", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.238
+_.str.238:
+	db	"indr", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.239
+_.str.239:
+	db	"otir", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.240
+_.str.240:
+	db	"otdr", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.241
+_.str.241:
+	db	"neg", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.242
+_.str.242:
+	db	"ld a,i", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.243
+_.str.243:
+	db	"ld a,r", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.244
+_.str.244:
+	db	"ld i,a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.245
+_.str.245:
+	db	"ld r,a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.246
+_.str.246:
+	db	"im 0", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.247
+_.str.247:
+	db	"im 1", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.248
+_.str.248:
+	db	"im 2", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.249
+_.str.249:
+	db	"retn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.250
+_.str.250:
+	db	"reti", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.251
+_.str.251:
+	db	"sll b", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.252
+_.str.252:
+	db	"sll c", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.253
+_.str.253:
+	db	"sll d", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.254
+_.str.254:
+	db	"sll e", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.255
+_.str.255:
+	db	"sll h", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.256
+_.str.256:
+	db	"sll l", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.257
+_.str.257:
+	db	"sll (hl)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.258
+_.str.258:
+	db	"sll a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.259
+_.str.259:
+	db	"rld", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.260
+_.str.260:
+	db	"rrd", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.261
+_.str.261:
+	db	"ld ixl,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.262
+_.str.262:
+	db	"ld ixh,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.263
+_.str.263:
+	db	"ld iyl,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.264
+_.str.264:
+	db	"ld iyh,nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.265
+_.str.265:
+	db	"ld a,ixh", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.266
+_.str.266:
+	db	"ld a,ixl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.267
+_.str.267:
+	db	"ld a,iyh", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.268
+_.str.268:
+	db	"ld a,iyl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.269
+_.str.269:
+	db	"ld ixh,a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.270
+_.str.270:
+	db	"ld ixl,a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.271
+_.str.271:
+	db	"ld iyh,a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.272
+_.str.272:
+	db	"ld iyl,a", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.273
+_.str.273:
+	db	"lea bc,sp+nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.274
+_.str.274:
+	db	"lea de,sp+nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.275
+_.str.275:
+	db	"lea hl,sp+nn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.276
+_.str.276:
+	db	"ld u,nnnnnn", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.277
+_.str.277:
+	db	"ld (nnnnnn),u", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.278
+_.str.278:
+	db	"ld u,(nnnnnn)", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.279
+_.str.279:
+	db	"push u", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.280
+_.str.280:
+	db	"pop u", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.281
+_.str.281:
+	db	"mlt ix", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.282
+_.str.282:
+	db	"mlt iy", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.283
+_.str.283:
+	db	"tst bc", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.284
+_.str.284:
+	db	"tst de", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.285
+_.str.285:
+	db	"tst hl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.286
+_.str.286:
+	db	"tst sp", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.287
+_.str.287:
+	db	"sub ixh", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.288
+_.str.288:
+	db	"sub ixl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.289
+_.str.289:
+	db	"sub iyh", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.290
+_.str.290:
+	db	"sub iyl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.291
+_.str.291:
+	db	"and ixh", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.292
+_.str.292:
+	db	"and ixl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.293
+_.str.293:
+	db	"and iyh", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.294
+_.str.294:
+	db	"and iyl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.295
+_.str.295:
+	db	"or ixh", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.296
+_.str.296:
+	db	"or ixl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.297
+_.str.297:
+	db	"or iyh", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.298
+_.str.298:
+	db	"or iyl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.299
+_.str.299:
+	db	"xor ixh", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.300
+_.str.300:
+	db	"xor ixl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.301
+_.str.301:
+	db	"xor iyh", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.302
+_.str.302:
+	db	"xor iyl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.303
+_.str.303:
+	db	"cp ixh", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.304
+_.str.304:
+	db	"cp ixl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.305
+_.str.305:
+	db	"cp iyh", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.306
+_.str.306:
+	db	"cp iyl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.307
+_.str.307:
+	db	"inc ixh", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.308
+_.str.308:
+	db	"inc ixl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.309
+_.str.309:
+	db	"inc iyh", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.310
+_.str.310:
+	db	"inc iyl", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.311
+_.str.311:
+	db	"dec ixh", 0
+
+	section	.rodata,"a",@progbits
+	private	_.str.312
+_.str.312:
+	db	"dec ixl", 0
+
+	section	.rodata,"a",@progbits
+	public	_instruction_table
+_instruction_table:
+	dl	_.str.20
+	db	">", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.1.21
+	db	"", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.2.22
+	db	"", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.3.23
+	db	"", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.4.24
+	db	"", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.5.25
+	db	"&", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.6.26
+	db	".", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.7.27
+	db	"Æ", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.8.28
+	db	"Ö", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.9.29
+	db	"æ", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.10.30
+	db	"ö", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.11.31
+	db	"î", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.12.32
+	db	"<", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.13.33
+	db	"=", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.14.34
+	db	"Ã", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.15.35
+	db	"Í", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.16.36
+	db	"É", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.17.37
+	db	5 dup 0
+	db	1
+	dl	4
+	dl	_.str.18.38
+	db	"v", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.19.39
+	db	"õ", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.20.40
+	db	"ñ", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.21
+	db	"Å", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.22
+	db	"Á", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.23
+	db	"Õ", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.24
+	db	"Ñ", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.25
+	db	"å", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.26
+	db	"á", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.27
+	db	"6", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.28
+	db	"~", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.29
+	db	"w", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.30
+	db	"x", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.31
+	db	"y", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.32
+	db	"z", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.33
+	db	"{", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.34
+	db	"|", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.35
+	db	"}", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.36
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.37
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.38
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.39
+	db	13, 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.40
+	db	"€", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.41
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.42
+	db	"‚", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.43
+	db	"ƒ", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.44
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.45
+	db	"‘", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.46
+	db	" ", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.47
+	db	"¡", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.48
+	db	"°", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.49
+	db	"±", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.50
+	db	"¨", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.51
+	db	"©", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.52
+	db	"", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.53
+	db	"", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.54
+	db	"!", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.55
+	db	"1", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.56
+	db	"", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.57
+	db	" ", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.58
+	db	"(", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.59
+	db	"0", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.60
+	db	"8", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.61
+	db	10, 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.62
+	db	26, 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.63
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.64
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.65
+	db	"	", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.66
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.67
+	db	")", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.68
+	db	"9", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.69
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.70
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.71
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.72
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.73
+	db	"¿", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.74
+	db	"¸", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.75
+	db	"¹", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.76
+	db	"º", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.77
+	db	"˜", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.78
+	db	"™", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.79
+	db	"š", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.80
+	db	"›", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.81
+	db	"œ", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.82
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.83
+	db	"Ÿ", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.84
+	db	"Ş", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.85
+	db	"İ#", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.86
+	db	"İ+", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.87
+	db	"ı#", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.88
+	db	"ı+", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.89
+	db	"ù", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.90
+	db	"İù", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.91
+	db	"ıù", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.92
+	db	"İå", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.93
+	db	"İá", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.94
+	db	"ıå", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.95
+	db	"ıá", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.96
+	db	"í ", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.97
+	db	"í¨", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.98
+	db	"í°", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.99
+	db	"í¸", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.100
+	db	"í¡", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.101
+	db	"í©", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.102
+	db	"í±", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.103
+	db	"í¹", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.104
+	db	"Ë@", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.105
+	db	"Ë", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.106
+	db	"ËÀ", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.107
+	db	"Ë€", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.108
+	db	"À", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.109
+	db	"È", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.110
+	db	"Ğ", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.111
+	db	"Ø", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.112
+	db	"Ä", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.113
+	db	"Ì", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.114
+	db	"Ô", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.115
+	db	"Ü", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.116
+	db	"„", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.117
+	db	"…", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.118
+	db	"’", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.119
+	db	"“", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.120
+	db	"”", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.121
+	db	"•", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.122
+	db	"Ë", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.123
+	db	"Ë", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.124
+	db	"Ë ", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.125
+	db	"Ë(", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.126
+	db	"Ë8", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.127
+	db	"ËI", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.128
+	db	"ËÉ", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.129
+	db	"Ë‰", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.130
+	db	":", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.131
+	db	"2", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.132
+	db	"¢", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.133
+	db	"£", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.134
+	db	"¤", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.135
+	db	"¥", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.136
+	db	"²", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.137
+	db	"³", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.138
+	db	"´", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.139
+	db	"µ", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.140
+	db	"ª", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.141
+	db	"«", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.142
+	db	"¬", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.143
+	db	"­", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.144
+	db	"»", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.145
+	db	"¼", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.146
+	db	"½", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.147
+	db	"İ~", 0, 0, 0
+	db	3
+	dl	1
+	dl	_.str.148
+	db	"İw", 0, 0, 0
+	db	3
+	dl	1
+	dl	_.str.149
+	db	"ı~", 0, 0, 0
+	db	3
+	dl	1
+	dl	_.str.150
+	db	"ıw", 0, 0, 0
+	db	3
+	dl	1
+	dl	_.str.151
+	db	"ó", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.152
+	db	"û", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.153
+	db	"/", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.154
+	db	"7", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.155
+	db	"?", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.156
+	db	"ë", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.157
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.158
+	db	"Ù", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.159
+	db	"ã", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.160
+	db	"İã", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.161
+	db	"ıã", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.162
+	db	"Û", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.163
+	db	"Ó", 0, 0, 0, 0
+	db	2
+	dl	1
+	dl	_.str.164
+	db	"İ†", 0, 0, 0
+	db	3
+	dl	1
+	dl	_.str.165
+	db	"İ–", 0, 0, 0
+	db	3
+	dl	1
+	dl	_.str.166
+	db	"ı†", 0, 0, 0
+	db	3
+	dl	1
+	dl	_.str.167
+	db	"ı–", 0, 0, 0
+	db	3
+	dl	1
+	dl	_.str.168
+	db	"Ç", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.169
+	db	"Ï", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.170
+	db	"×", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.171
+	db	"ß", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.172
+	db	"ík", 0, 0, 0
+	db	5
+	dl	3
+	dl	_.str.173
+	db	"íc", 0, 0, 0
+	db	5
+	dl	3
+	dl	_.str.174
+	db	"í[", 0, 0, 0
+	db	5
+	dl	3
+	dl	_.str.175
+	db	"íS", 0, 0, 0
+	db	5
+	dl	3
+	dl	_.str.176
+	db	"í{", 0, 0, 0
+	db	5
+	dl	3
+	dl	_.str.177
+	db	"ís", 0, 0, 0
+	db	5
+	dl	3
+	dl	_.str.68
+	db	"9", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.178
+	db	"íz", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.179
+	db	"ír", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.180
+	db	"İ~", 0, 0, 0
+	db	4
+	dl	2
+	dl	_.str.181
+	db	"İw", 0, 0, 0
+	db	4
+	dl	2
+	dl	_.str.182
+	db	"ı~", 0, 0, 0
+	db	4
+	dl	2
+	dl	_.str.183
+	db	"ıw", 0, 0, 0
+	db	4
+	dl	2
+	dl	_.str.184
+	db	"íL", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.185
+	db	"í\", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.186
+	db	"íl", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.187
+	db	"í|", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.188
+	db	"í#", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.189
+	db	"í´", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.190
+	db	"í¼", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.191
+	db	"íµ", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.192
+	db	"í½", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.193
+	db	"", 0, 0, 0, 0
+	db	4
+	dl	3
+	dl	_.str.194
+	db	"", 0, 0, 0, 0
+	db	4
+	dl	3
+	dl	_.str.195
+	db	"!", 0, 0, 0, 0
+	db	4
+	dl	3
+	dl	_.str.196
+	db	"1", 0, 0, 0, 0
+	db	4
+	dl	3
+	dl	_.str.197
+	db	"íJ", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.198
+	db	"íZ", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.199
+	db	"íj", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.178
+	db	"íz", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.200
+	db	"í<", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.201
+	db	"í", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.202
+	db	"í", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.203
+	db	"íŠ", 0, 0, 0
+	db	4
+	dl	2
+	dl	_.str.204
+	db	"í‹", 0, 0, 0
+	db	5
+	dl	3
+	dl	_.str.205
+	db	"Â", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.206
+	db	"Ê", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.207
+	db	"Ò", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.208
+	db	"Ú", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.209
+	db	"ä", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.210
+	db	"ì", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.211
+	db	"ô", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.212
+	db	"ü", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.213
+	db	"à", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.214
+	db	"è", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.215
+	db	"ğ", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.216
+	db	"ø", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.69
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.70
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.71
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.72
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.157
+	db	"", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.217
+	db	"*", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.218
+	db	"""", 0, 0, 0, 0
+	db	3
+	dl	2
+	dl	_.str.219
+	db	"İ", 0, 0, 0
+	db	4
+	dl	2
+	dl	_.str.220
+	db	"ı", 0, 0, 0
+	db	4
+	dl	2
+	dl	_.str.221
+	db	"İ", 0, 0, 0
+	db	4
+	dl	2
+	dl	_.str.222
+	db	"ı", 0, 0, 0
+	db	4
+	dl	2
+	dl	_.str.223
+	db	"İ!", 0, 0, 0
+	db	4
+	dl	2
+	dl	_.str.224
+	db	"ı!", 0, 0, 0
+	db	4
+	dl	2
+	dl	_.str.225
+	db	"İ1", 0, 0, 0
+	db	4
+	dl	2
+	dl	_.str.226
+	db	"ı1", 0, 0, 0
+	db	4
+	dl	2
+	dl	_.str.21
+	db	"Å", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.23
+	db	"Õ", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.25
+	db	"å", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.19.39
+	db	"õ", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.22
+	db	"Á", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.24
+	db	"Ñ", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.26
+	db	"á", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.20.40
+	db	"ñ", 0, 0, 0, 0
+	db	1
+	dl	4
+	dl	_.str.227
+	db	"İ!", 0, 0, 0
+	db	5
+	dl	3
+	dl	_.str.228
+	db	"ı!", 0, 0, 0
+	db	5
+	dl	3
+	dl	_.str.229
+	db	"İ*", 0, 0, 0
+	db	5
+	dl	3
+	dl	_.str.230
+	db	"ı*", 0, 0, 0
+	db	5
+	dl	3
+	dl	_.str.231
+	db	"İ""", 0, 0, 0
+	db	5
+	dl	3
+	dl	_.str.232
+	db	"ı""", 0, 0, 0
+	db	5
+	dl	3
+	dl	_.str.233
+	db	"í¢", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.234
+	db	"íª", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.235
+	db	"í£", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.236
+	db	"í«", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.237
+	db	"í²", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.238
+	db	"íº", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.239
+	db	"í³", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.240
+	db	"í»", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.98
+	db	"í°", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.99
+	db	"í¸", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.102
+	db	"í±", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.103
+	db	"í¹", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.241
+	db	"íD", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.242
+	db	"íW", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.243
+	db	"í_", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.244
+	db	"íG", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.245
+	db	"íO", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.246
+	db	"íF", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.247
+	db	"íV", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.248
+	db	"í^", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.249
+	db	"íE", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.250
+	db	"íM", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.251
+	db	"Ë0", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.252
+	db	"Ë1", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.253
+	db	"Ë2", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.254
+	db	"Ë3", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.255
+	db	"Ë4", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.256
+	db	"Ë5", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.257
+	db	"Ë6", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.258
+	db	"Ë7", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.259
+	db	"ío", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.260
+	db	"íg", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.261
+	db	"İ.", 0, 0, 0
+	db	3
+	dl	1
+	dl	_.str.262
+	db	"İ&", 0, 0, 0
+	db	3
+	dl	1
+	dl	_.str.263
+	db	"ı.", 0, 0, 0
+	db	3
+	dl	1
+	dl	_.str.264
+	db	"ı&", 0, 0, 0
+	db	3
+	dl	1
+	dl	_.str.265
+	db	"İ|", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.266
+	db	"İ}", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.267
+	db	"ı|", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.268
+	db	"ı}", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.269
+	db	"İg", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.270
+	db	"İo", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.271
+	db	"ıg", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.272
+	db	"ıo", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.273
+	db	"í", 0, 0, 0
+	db	4
+	dl	2
+	dl	_.str.274
+	db	"í", 0, 0, 0
+	db	4
+	dl	2
+	dl	_.str.275
+	db	"í!", 0, 0, 0
+	db	4
+	dl	2
+	dl	_.str.276
+	db	"ím", 0, 0, 0
+	db	5
+	dl	3
+	dl	_.str.277
+	db	"íe", 0, 0, 0
+	db	5
+	dl	3
+	dl	_.str.278
+	db	"ío", 0, 0, 0
+	db	5
+	dl	3
+	dl	_.str.279
+	db	"íu", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.280
+	db	"í}", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.281
+	db	"íÜ", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.282
+	db	"íü", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.283
+	db	"í", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.284
+	db	"í", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.285
+	db	"í$", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.286
+	db	"í4", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.190
+	db	"í¼", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.191
+	db	"íµ", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.192
+	db	"í½", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.287
+	db	"İ”", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.288
+	db	"İ•", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.289
+	db	"ı”", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.290
+	db	"ı•", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.291
+	db	"İ¤", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.292
+	db	"İ¥", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.293
+	db	"ı¤", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.294
+	db	"ı¥", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.295
+	db	"İ´", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.296
+	db	"İµ", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.297
+	db	"ı´", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.298
+	db	"ıµ", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.299
+	db	"İ¬", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.300
+	db	"İ­", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.301
+	db	"ı¬", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.302
+	db	"ı­", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.303
+	db	"İ¼", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.304
+	db	"İ½", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.305
+	db	"ı¼", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.306
+	db	"ı½", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.307
+	db	"İ$", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.308
+	db	"İ,", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.309
+	db	"ı$", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.310
+	db	"ı,", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.311
+	db	"İ%", 0, 0, 0
+	db	2
+	dl	4
+	dl	_.str.312
+	db	"İ-", 0, 0, 0
+	db	2
+	dl	4
+
+	ident	"clang version 15.0.0 (https://github.com/CE-Programming/llvm-project 23b78267b5d376b232475d0805a937e54b61e0d0)"
+	ident	"clang version 15.0.0 (https://github.com/CE-Programming/llvm-project 23b78267b5d376b232475d0805a937e54b61e0d0)"
+	ident	"clang version 15.0.0 (https://github.com/CE-Programming/llvm-project 23b78267b5d376b232475d0805a937e54b61e0d0)"
+	extern	__Unwind_SjLj_Register
+	extern	_malloc
+	extern	_strtoul
+	extern	_memcpy
+	extern	_os_PutStrFull
+	extern	_ti_Open
+	extern	_delay
+	extern	_realloc
+	extern	_free
+	extern	_strcasecmp
+	extern	_isspace
+	extern	_strcmp
+	extern	_ti_Write
+	extern	_ti_SetArchiveStatus
+	extern	__imulu
+	extern	_strtok
+	extern	_ti_Close
+	extern	_strncpy
+	extern	_snprintf
+	extern	_os_DrawStatusBar
+	extern	_strlen
+	extern	_ti_Read
+	extern	_os_GetCSC
+	extern	__lshru
+	extern	_os_HomeUp
+	extern	_os_ThrowError
+	extern	_isalpha
+	extern	__frameset
+	extern	_ti_Delete
+	extern	_os_ClrLCD
+	extern	__Unwind_SjLj_Unregister
+	extern	_os_NewLine

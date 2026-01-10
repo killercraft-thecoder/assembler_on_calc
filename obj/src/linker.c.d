@@ -1,0 +1,29 @@
+obj/src/linker.c.bc: src\linker.c src\linker.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\stdint.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\cdefs.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\tice.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\sys\basicusb.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\stdbool.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\sys\lcd.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\sys\power.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\sys\rtc.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\sys\timers.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\sys\util.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\ti\error.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\ti\flags.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\ti\getcsc.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\ti\getkey.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\ti\graph.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\ti\real.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\ti\info.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\stddef.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\ti\python.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\ti\screen.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\ti\ui.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\ti\tokens.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\ti\vars.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\fileioc.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\stdlib.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\stdio.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\stdarg.h \
+  C:\Users\Lando\Downloads\CEdev-Windows\CEdev\include\string.h
