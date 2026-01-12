@@ -21,7 +21,7 @@ typedef unsigned long uint24_t;
 #endif
 
 char **stored_lines = NULL; // pointer to array of char*
-uint16_t  stored_count = 0;  // number of lines read
+uint16_t stored_count = 0;  // number of lines read
 uint16_t capacity = 0;      // allocated capacity
 
 typedef struct
@@ -38,7 +38,8 @@ uint8_t label_count = 0;
 #define MAX_INCLUDE_DEPTH 8
 
 // helper struct for read result
-typedef struct {
+typedef struct
+{
     char **lines;
     uint16_t count;
 } LinesResult;
@@ -77,27 +78,36 @@ int find_label(const char *name, uint24_t *out_addr)
 }
 
 // Read an AppVar into a LinesResult. Caller must free lines and each line.
-static LinesResult read_appvar_lines(const char *name) {
-    LinesResult res = { NULL, 0 };
+static LinesResult read_appvar_lines(const char *name)
+{
+    LinesResult res = {NULL, 0};
     ti_var_t f = ti_Open(name, "r");
-    if (!f) return res;
+    if (!f)
+        return res;
     uint8_t ch;
     char buf[256];
     uint16_t pos = 0;
     uint16_t count = 0;
     uint16_t cap = 0;
 
-    while (ti_Read(&ch, 1, 1, f) == 1) {
-        if (ch == '\n' || ch == '\r') {
-            if (pos > 0) {
+    while (ti_Read(&ch, 1, 1, f) == 1)
+    {
+        if (ch == '\n' || ch == '\r')
+        {
+            if (pos > 0)
+            {
                 buf[pos] = '\0';
-                if (count >= cap) {
+                if (count >= cap)
+                {
                     size_t newcap = cap + (MIN_ALLOC_SIZE / sizeof(char *));
                     char **newmem = realloc(res.lines, newcap * sizeof(char *));
-                    if (!newmem) { // cleanup and return empty
-                        for (uint16_t i = 0; i < count; i++) free(res.lines[i]);
+                    if (!newmem)
+                    { // cleanup and return empty
+                        for (uint16_t i = 0; i < count; i++)
+                            free(res.lines[i]);
                         free(res.lines);
-                        res.lines = NULL; res.count = 0;
+                        res.lines = NULL;
+                        res.count = 0;
                         ti_Close(f);
                         return res;
                     }
@@ -106,10 +116,13 @@ static LinesResult read_appvar_lines(const char *name) {
                 }
                 size_t len = strlen(buf) + 1;
                 res.lines[count] = malloc(len);
-                if (!res.lines[count]) {
-                    for (uint16_t i = 0; i < count; i++) free(res.lines[i]);
+                if (!res.lines[count])
+                {
+                    for (uint16_t i = 0; i < count; i++)
+                        free(res.lines[i]);
                     free(res.lines);
-                    res.lines = NULL; res.count = 0;
+                    res.lines = NULL;
+                    res.count = 0;
                     ti_Close(f);
                     return res;
                 }
@@ -117,20 +130,27 @@ static LinesResult read_appvar_lines(const char *name) {
                 count++;
                 pos = 0;
             }
-        } else if (pos < sizeof(buf) - 1) {
+        }
+        else if (pos < sizeof(buf) - 1)
+        {
             buf[pos++] = ch;
         }
     }
     // last line if no newline at EOF
-    if (pos > 0) {
+    if (pos > 0)
+    {
         buf[pos] = '\0';
-        if (count >= cap) {
+        if (count >= cap)
+        {
             size_t newcap = cap + (MIN_ALLOC_SIZE / sizeof(char *));
             char **newmem = realloc(res.lines, newcap * sizeof(char *));
-            if (!newmem) {
-                for (uint16_t i = 0; i < count; i++) free(res.lines[i]);
+            if (!newmem)
+            {
+                for (uint16_t i = 0; i < count; i++)
+                    free(res.lines[i]);
                 free(res.lines);
-                res.lines = NULL; res.count = 0;
+                res.lines = NULL;
+                res.count = 0;
                 ti_Close(f);
                 return res;
             }
@@ -139,10 +159,13 @@ static LinesResult read_appvar_lines(const char *name) {
         }
         size_t len = strlen(buf) + 1;
         res.lines[count] = malloc(len);
-        if (!res.lines[count]) {
-            for (uint16_t i = 0; i < count; i++) free(res.lines[i]);
+        if (!res.lines[count])
+        {
+            for (uint16_t i = 0; i < count; i++)
+                free(res.lines[i]);
             free(res.lines);
-            res.lines = NULL; res.count = 0;
+            res.lines = NULL;
+            res.count = 0;
             ti_Close(f);
             return res;
         }
@@ -156,71 +179,96 @@ static LinesResult read_appvar_lines(const char *name) {
 }
 
 // parse include directive line and extract filename (returns malloc'd string or NULL)
-static char *parse_include_filename(const char *line) {
+static char *parse_include_filename(const char *line)
+{
     char tmp[256];
-    strncpy(tmp, line, sizeof(tmp)); tmp[255] = '\0';
+    strncpy(tmp, line, sizeof(tmp));
+    tmp[255] = '\0';
     trim(tmp);
     // accept: INCLUDE "NAME" or .include "NAME" or INCLUDE NAME
     char *p = tmp;
     char *tok = strtok(p, " \t");
-    if (!tok) return NULL;
-    if (strcasecmp(tok, "INCLUDE") != 0 && strcasecmp(tok, ".include") != 0) return NULL;
+    if (!tok)
+        return NULL;
+    if (strcasecmp(tok, "INCLUDE") != 0 && strcasecmp(tok, ".include") != 0)
+        return NULL;
     char *rest = strtok(NULL, "");
-    if (!rest) return NULL;
+    if (!rest)
+        return NULL;
     trim(rest);
     // strip quotes if present
-    if (rest[0] == '"' || rest[0] == '\'') {
+    if (rest[0] == '"' || rest[0] == '\'')
+    {
         char quote = rest[0];
         size_t L = strlen(rest);
-        if (L >= 2 && rest[L-1] == quote) {
-            rest[L-1] = '\0';
+        if (L >= 2 && rest[L - 1] == quote)
+        {
+            rest[L - 1] = '\0';
             rest++;
-        } else {
+        }
+        else
+        {
             // malformed
             return NULL;
         }
     }
     // copy name
     char *name = malloc(strlen(rest) + 1);
-    if (name) strcpy(name, rest);
+    if (name)
+        strcpy(name, rest);
     return name;
 }
 
 // process includes in stored_lines; aborts on error by printing message and returning false
-static bool process_includes(void) {
+static bool process_includes(void)
+{
     // simple stack to detect recursion and depth
     char *include_stack[MAX_INCLUDE_DEPTH];
     int depth = 0;
 
     // We'll iterate through stored_lines and build a new array in-place
     uint16_t i = 0;
-    while (i < stored_count) {
+    while (i < stored_count)
+    {
         char *line = stored_lines[i];
         char tmp[256];
-        strncpy(tmp, line, sizeof(tmp)); tmp[255] = '\0';
+        strncpy(tmp, line, sizeof(tmp));
+        tmp[255] = '\0';
         trim(tmp);
         // detect include
         char *fname = parse_include_filename(tmp);
-        if (!fname) { i++; continue; } // not an include, keep it
+        if (!fname)
+        {
+            i++;
+            continue;
+        } // not an include, keep it
         // check recursion depth
-        if (depth >= MAX_INCLUDE_DEPTH) {
+        if (depth >= MAX_INCLUDE_DEPTH)
+        {
             os_PutStrFull("Include depth exceeded\n");
             free(fname);
             return false;
         }
         // check for cycles by name
         bool cycle = false;
-        for (int s = 0; s < depth; s++) {
-            if (strcmp(include_stack[s], fname) == 0) { cycle = true; break; }
+        for (int s = 0; s < depth; s++)
+        {
+            if (strcmp(include_stack[s], fname) == 0)
+            {
+                cycle = true;
+                break;
+            }
         }
-        if (cycle) {
+        if (cycle)
+        {
             os_PutStrFull("Include cycle detected\n");
             free(fname);
             return false;
         }
         // read included file
         LinesResult inc = read_appvar_lines(fname);
-        if (!inc.lines || inc.count == 0) {
+        if (!inc.lines || inc.count == 0)
+        {
             os_PutStrFull("Include file not found or empty\n");
             free(fname);
             return false;
@@ -228,16 +276,20 @@ static bool process_includes(void) {
         // splice: replace stored_lines[i] with inc.lines[0..n-1]
         // compute new required capacity
         uint32_t new_count = stored_count - 1 + inc.count; // remove 1 include line, add inc.count
-        if (new_count > capacity) {
+        if (new_count > capacity)
+        {
             // grow capacity in same chunk style
             size_t needed = new_count;
             size_t newcap = capacity;
-            while (newcap < needed) newcap += (MIN_ALLOC_SIZE / sizeof(char *));
+            while (newcap < needed)
+                newcap += (MIN_ALLOC_SIZE / sizeof(char *));
             char **newmem = realloc(stored_lines, newcap * sizeof(char *));
-            if (!newmem) {
+            if (!newmem)
+            {
                 os_PutStrFull("Memory error expanding includes\n");
                 // cleanup inc
-                for (uint16_t k = 0; k < inc.count; k++) free(inc.lines[k]);
+                for (uint16_t k = 0; k < inc.count; k++)
+                    free(inc.lines[k]);
                 free(inc.lines);
                 free(fname);
                 return false;
@@ -246,18 +298,25 @@ static bool process_includes(void) {
             capacity = newcap;
         }
         // shift tail down/up to make room or close gap
-        if (inc.count > 1) {
+        if (inc.count > 1)
+        {
             // move tail up
-            for (uint16_t t = stored_count; t > i+1; t--) {
+            for (uint16_t t = stored_count; t > i + 1; t--)
+            {
                 stored_lines[t - 1 + (inc.count - 1)] = stored_lines[t - 1];
             }
-        } else if (inc.count == 0) {
+        }
+        else if (inc.count == 0)
+        {
             // nothing to insert, just remove line
-            for (uint16_t t = i; t < stored_count - 1; t++) stored_lines[t] = stored_lines[t + 1];
+            for (uint16_t t = i; t < stored_count - 1; t++)
+                stored_lines[t] = stored_lines[t + 1];
             stored_count--;
             free(fname);
             continue;
-        } else if (inc.count == 1) {
+        }
+        else if (inc.count == 1)
+        {
             // replace in place
             free(stored_lines[i]);
             stored_lines[i] = inc.lines[0];
@@ -271,7 +330,8 @@ static bool process_includes(void) {
         // free the include line memory
         free(stored_lines[i]);
         // copy inc.lines into stored_lines[i..i+inc.count-1]
-        for (uint16_t k = 0; k < inc.count; k++) {
+        for (uint16_t k = 0; k < inc.count; k++)
+        {
             stored_lines[i + k] = inc.lines[k];
         }
         // update stored_count
@@ -285,7 +345,7 @@ static bool process_includes(void) {
     return true;
 }
 
-void assemble_line(const char *line, uint24_t *pc, bool pass2)
+void assemble_line(const char *line, uint24_t *pc, bool pass2, uint24_t line_number)
 {
     char *line_copy = line;
     trim(line_copy);
@@ -367,7 +427,9 @@ void assemble_line(const char *line, uint24_t *pc, bool pass2)
                 {
                     if (pass2)
                     {
-                        os_PutStrFull("Undefined label\n");
+                        char errbuf[32];
+                        snprintf(errbuf, sizeof(errbuf), "Undefined label at line:%u\n", (unsigned)line_number);
+                        os_PutStrFull(errbuf);
                         return;
                     }
                     addr = 0; // placeholder in pass1
@@ -395,6 +457,8 @@ void assemble_line(const char *line, uint24_t *pc, bool pass2)
     const Instruction *inst = lookup_instruction(first);
     if (!inst)
     {
+        char errbuf[32];
+        snprintf(errbuf, sizeof(errbuf), "Unknown instruction:%s at line:%u\n", first, (unsigned)line_number);
         os_PutStrFull("Unknown instruction\n");
         return;
     }
@@ -408,7 +472,9 @@ void assemble_line(const char *line, uint24_t *pc, bool pass2)
         char *arg_str = strtok(NULL, " ,");
         if (!arg_str)
         {
-            os_PutStrFull("Missing operand\n");
+            char errbuf[32];
+            snprintf(errbuf, sizeof(errbuf), "Missing operand at line:%u\n", (unsigned)line_number);
+            os_PutStrFull(errbuf);
             return;
         }
 
@@ -420,7 +486,9 @@ void assemble_line(const char *line, uint24_t *pc, bool pass2)
             {
                 if (pass2)
                 {
-                    os_PutStrFull("Undefined label\n");
+                    char errbuf[32];
+                    snprintf(errbuf, sizeof(errbuf), "Undefined label at line:%u\n", (unsigned)line_number);
+                    os_PutStrFull(errbuf);
                     return;
                 }
                 addr = 0;
@@ -467,7 +535,9 @@ void print_version(void)
     os_PutStrFull(buf);
     os_NewLine();
     delay(10);
-    while (!os_GetCSC()) {};
+    while (!os_GetCSC())
+    {
+    };
 }
 
 int main(void)
@@ -491,7 +561,9 @@ int main(void)
     {
         os_PutStrFull("File not found");
         os_NewLine();
-        while (!os_GetCSC()) {};
+        while (!os_GetCSC())
+        {
+        };
         return 0;
     }
 
@@ -574,14 +646,14 @@ int main(void)
     pc = 0;
     for (uint16_t i = 0; i < stored_count; i++)
     {
-        assemble_line(stored_lines[i], &pc, false);
+        assemble_line(stored_lines[i], &pc, false, i);
     }
 
     // --- Pass 2: emit code ---
     pc = 0;
     for (uint16_t i = 0; i < stored_count; i++)
     {
-        assemble_line(stored_lines[i], &pc, true);
+        assemble_line(stored_lines[i], &pc, true, i);
     }
 
     os_PutStrFull("Build complete");
